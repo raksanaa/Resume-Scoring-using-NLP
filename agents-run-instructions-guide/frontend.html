@@ -1,0 +1,192 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Resume Matcher</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(135deg, #b2fefa, #0ed2f7);
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            color: #222;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            flex-direction: column;
+            overflow-x: hidden;
+        }
+
+        .header-img {
+            width: 300px;
+            margin-bottom: 20px;
+            animation: pulse 4s infinite ease-in-out;
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+            }
+            50% {
+                transform: scale(1.05);
+            }
+        }
+
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+            max-width: 600px;
+            width: 90%;
+            text-align: center;
+        }
+
+        h1 {
+            color: #0ed2f7;
+            font-size: 32px;
+            margin-bottom: 10px;
+        }
+
+        p {
+            font-size: 16px;
+            margin-bottom: 20px;
+        }
+
+        label {
+            font-weight: bold;
+            text-align: left;
+            display: block;
+            margin-top: 20px;
+        }
+
+        textarea, input[type="file"] {
+            width: 100%;
+            padding: 12px;
+            margin-top: 10px;
+            border-radius: 10px;
+            border: 1px solid #ccc;
+            font-size: 16px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 12px;
+            width: 100%;
+            background-color: #0ed2f7;
+            color: white;
+            font-size: 18px;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0bbde0;
+        }
+
+        .loading, .result {
+            margin-top: 20px;
+            font-size: 18px;
+        }
+
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            border-left-color: #0ed2f7;
+            border-radius: 50%;
+            width: 30px;
+            height: 30px;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            margin-left: 10px;
+        }
+
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        .footer-gif {
+            width: 300px;
+            margin-top: 30px;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Animated Illustration -->
+    <img src="https://cdn.dribbble.com/userupload/12500996/file/original-b458fe398a6d7f4e9999ce66ec856ff9.gif" alt="Resume processing" class="footer-gif" alt="AI Resume Matcher Illustration" class="header-img">
+
+    <div class="container">
+        <h1>AI Resume Matcher</h1>
+        <p>Upload your resume and compare it with a job description using NLP</p>
+
+        <form id="resumeForm">
+            <label for="jobDescription">Job Description</label>
+            <textarea id="jobDescription" placeholder="Paste the job description here..."></textarea>
+
+            <label for="resumeUpload">Upload Resume</label>
+            <input type="file" id="resumeUpload" accept=".pdf,.txt">
+
+            <button type="button" onclick="submitForm()">Match Resume</button>
+        </form>
+
+        <div id="loading" class="loading" style="display: none;">
+            Matching in progress...
+            <div class="spinner"></div>
+        </div>
+
+        <div class="result" id="result" style="display: none;"></div>
+    </div>
+
+    <!-- Motivational or instructional gif -->
+    <img src="https://vitalflux.com/wp-content/uploads/2022/11/resume-screening-and-shortlisting-using-machine-learning.png" alt="Resume processing" class="footer-gif">
+
+    <script>
+        async function submitForm() {
+            const jobDescription = document.getElementById('jobDescription').value;
+            const resumeFile = document.getElementById('resumeUpload').files[0];
+
+            if (!jobDescription || !resumeFile) {
+                alert('Please provide a job description and upload a resume.');
+                return;
+            }
+
+            const formData = new FormData();
+            formData.append('job_description', jobDescription);
+            formData.append('resume', resumeFile);
+
+            document.getElementById('loading').style.display = 'block';
+            document.getElementById('result').style.display = 'none';
+
+            try {
+                const response = await fetch('http://localhost:8503/upload', {
+
+                    method: 'POST',
+                    body: formData
+                });
+
+                const result = await response.json();
+                document.getElementById('result').innerHTML = 'Similarity Score: <strong>' + (result.similarity_score * 100).toFixed(2) + '%</strong>';
+                document.getElementById('result').style.display = 'block';
+            } catch (error) {
+                console.error('Error:', error);
+                document.getElementById('result').innerHTML = 'Error occurred. Please try again.';
+                document.getElementById('result').style.display = 'block';
+            } finally {
+                document.getElementById('loading').style.display = 'none';
+            }
+        }
+    </script>
+</body>
+</html>
+
+
+
+           
